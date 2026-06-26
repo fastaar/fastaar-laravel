@@ -16,12 +16,10 @@ class FastaarServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/fastaar.php', 'fastaar');
 
-        $this->app->singleton(FastaarClient::class, function ($app): FastaarClient {
-            return new FastaarClient(
-                apiKey: (string) config('fastaar.api_key'),
-                timeoutSeconds: (int) config('fastaar.timeout_seconds', 15),
-            );
-        });
+        $this->app->singleton(FastaarClient::class, fn ($app): FastaarClient => new FastaarClient(
+            apiKey: (string) config('fastaar.api_key'),
+            timeoutSeconds: (int) config('fastaar.timeout_seconds', 15),
+        ));
 
         $this->app->alias(FastaarClient::class, 'fastaar');
     }
