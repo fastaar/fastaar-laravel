@@ -62,7 +62,7 @@ For test environments, use a test key (e.g., `fk_test_...`). Payments auto-compl
 
 ### 1. Create a Payment & Redirect
 
-Initialize payments using the `Fastaar` Facade. The same `invoice_id` is idempotent, meaning you can retry requests without double-charging.
+`invoice_number` is required and acts as an idempotency key: retrying with the same value returns the existing payment instead of creating a duplicate, so a dropped connection never double-charges.
 
 ```php
 use Fastaar\Laravel\Facades\Fastaar;
@@ -72,7 +72,7 @@ public function checkout()
     try {
         $payment = Fastaar::createPayment([
             'amount' => 1250, // Amount in BDT
-            'invoice_id' => 'ORDER-42', // Your order reference
+            'invoice_number' => 'ORDER-42', // required — your order reference
             'success_url' => route('checkout.success'), // Customer returns here on success
             'cancel_url' => route('checkout.cancel'), // Customer returns here on cancellation
         ]);
@@ -95,14 +95,14 @@ use Fastaar\Laravel\Facades\Fastaar;
 $payment = Fastaar::getPayment('01jxyz...');
 
 // Look up by your internal invoice/order reference
-$payment = Fastaar::findByInvoiceId('ORDER-42');
+$payment = Fastaar::findByInvoiceNumber('ORDER-42');
 
 if ($payment && $payment['status'] === 'completed') {
     // Order is successfully paid
 }
 ```
 
-### 3. List Payments
+### 3. List Payments (filtered)
 
 Fetch a list of payments filtered by status or invoice ID, newest first:
 
@@ -115,7 +115,29 @@ $payments = Fastaar::listPayments([
 ]);
 ```
 
-### 4. Handling Webhooks
+### 4. Customers
+
+Store customer records to attach them to payments collected via payment links.
+
+```php
+use Fastaar\Laravel\Facades\Fastaar;
+
+// Create a customer — name and phone are required
+$customer = Fastaar::createCustomer([
+    'name'    => 'Rahim Uddin',
+    'phone'   => '01712345678',
+    'email'   => 'rahim@example.com',   // optional
+    'address' => 'Dhaka, Bangladesh',   // optional
+    'notes'   => 'VIP customer',        // optional
+]);
+
+// Retrieve, update, list
+$customer  = Fastaar::getCustomer($customer['id']);
+$customer  = Fastaar::updateCustomer($customer['id'], ['name' => 'Rahim Ahmed']);
+$customers = Fastaar::listCustomers(['email' => 'rahim@example.com']);
+```
+
+### 5. Handling Webhooks
 
 To secure your webhooks, register the signature verification middleware on your route:
 
@@ -126,7 +148,7 @@ Route::post('/webhooks/fastaar', function (Illuminate\Http\Request $request) {
     $event = $request->json()->all();
 
     if ($event['event'] === 'payment.completed') {
-        $orderId = $event['data']['invoice_id'];
+        $orderId = $event['data']['invoice_number'];
         $paymentId = $event['data']['id'];
 
         // Mark order as paid idempotently using $paymentId as the unique transaction key
