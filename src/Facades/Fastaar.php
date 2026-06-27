@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static array createPayment(array $params)
  * @method static array getPayment(string $paymentId)
  * @method static array listPayments(array $params = [])
- * @method static array|null findByInvoiceId(string $invoiceId)
+ * @method static array|null findByInvoiceNumber(string $invoiceNumber)
+ * @method static array refundPayment(string $paymentId)
  *
  * @see FastaarClient
  */

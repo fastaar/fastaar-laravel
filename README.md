@@ -115,7 +115,18 @@ $payments = Fastaar::listPayments([
 ]);
 ```
 
-### 4. Customers
+### 4. Refund a Payment
+
+Refund a completed payment. Only payments with status `completed` can be refunded. A `payment.refunded` webhook fires automatically.
+
+```php
+use Fastaar\Laravel\Facades\Fastaar;
+
+$payment = Fastaar::refundPayment('01jxyz...');
+// $payment['status'] === 'refunded'
+```
+
+### 5. Customers
 
 Store customer records to attach them to payments collected via payment links.
 
@@ -137,7 +148,7 @@ $customer  = Fastaar::updateCustomer($customer['id'], ['name' => 'Rahim Ahmed'])
 $customers = Fastaar::listCustomers(['email' => 'rahim@example.com']);
 ```
 
-### 5. Handling Webhooks
+### 6. Handling Webhooks
 
 To secure your webhooks, register the signature verification middleware on your route:
 
