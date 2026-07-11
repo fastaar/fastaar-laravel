@@ -56,6 +56,10 @@ FASTAAR_TIMEOUT_SECONDS=15
 
 For test environments, use a test key (e.g., `fk_test_...`). Payments auto-complete on the test checkout page without processing real money.
 
+Every key is scoped to abilities (`customers:read`/`write`, `payments:read`/`write`/`refund`) and can have an
+expiry date, set when you create the key in the merchant panel. A call outside the key's abilities returns
+`403 ability_denied`; a call with an expired key returns `401 authentication_error`.
+
 ---
 
 ## Usage
