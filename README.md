@@ -1,7 +1,9 @@
 # Fastaar Laravel Package
 
+[![CI](https://github.com/fastaar/fastaar-laravel/actions/workflows/ci.yml/badge.svg)](https://github.com/fastaar/fastaar-laravel/actions/workflows/ci.yml)
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/fastaar/fastaar-laravel.svg?style=flat-square)](https://packagist.org/packages/fastaar/fastaar-laravel)
 [![Total Downloads](https://img.shields.io/packagist/dt/fastaar/fastaar-laravel.svg?style=flat-square)](https://packagist.org/packages/fastaar/fastaar-laravel)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A modern, developer-friendly Laravel integration for the [Fastaar Payment Gateway](https://fastaar.com) — accept bKash & Nagad payments in Bangladesh.
 
@@ -22,18 +24,6 @@ Add the package via Composer:
 
 ```bash
 composer require fastaar/fastaar-laravel
-```
-
-### Repository Configuration (If installed prior to Packagist publishing)
-If you are installing this package from a custom VCS repository, define it in your project's `composer.json` first:
-
-```json
-"repositories": [
-    {
-        "type": "vcs",
-        "url": "https://github.com/fastaar/fastaar-laravel.git"
-    }
-],
 ```
 
 ---
