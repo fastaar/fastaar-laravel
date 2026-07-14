@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+jobs:
+  test:
+    name: PHP ${{ matrix.php-version }} / Laravel ${{ matrix.laravel-version }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ["8.2", "8.3", "8.4"]
+        laravel-version: ["10.*", "11.*", "12.*", "13.*"]
+        include:
+          - laravel-version: "10.*"
+            testbench-version: "8.*"
+          - laravel-version: "11.*"
+            testbench-version: "9.*"
+          - laravel-version: "12.*"
+            testbench-version: "10.*"
+          - laravel-version: "13.*"
+            testbench-version: "11.*"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: curl, json
+          coverage: none
+
+      - name: Install dependencies
+        run: |
+          composer require "illuminate/support:${{ matrix.laravel-version }}" "orchestra/testbench:${{ matrix.testbench-version }}" --no-update
+          composer update --prefer-dist --no-interaction --no-progress
+
+      - name: Run tests
+        run: vendor/bin/pest

@@ -66,7 +66,7 @@ expiry date, set when you create the key in the merchant panel. A call outside t
 
 ### 1. Create a Payment & Redirect
 
-`invoice_number` is required and acts as an idempotency key: retrying with the same value returns the existing payment instead of creating a duplicate, so a dropped connection never double-charges.
+`invoice_number` is required and acts as an idempotency key: if a payment already exists for it and hasn't reached `failed` or `expired`, creating another one throws a `FastaarException` with error type `duplicate_invoice_number` (HTTP 409) instead of creating a duplicate — so a dropped connection never double-charges.
 
 ```php
 use Fastaar\Laravel\Facades\Fastaar;
@@ -77,6 +77,7 @@ public function checkout()
         $payment = Fastaar::createPayment([
             'amount' => 1250, // Amount in BDT
             'invoice_number' => 'ORDER-42', // required — your order reference
+            'customer_id' => $customer['id'] ?? null, // optional — attach an existing customer
             'success_url' => route('checkout.success'), // Customer returns here on success
             'cancel_url' => route('checkout.cancel'), // Customer returns here on cancellation
         ]);
@@ -128,6 +129,11 @@ use Fastaar\Laravel\Facades\Fastaar;
 
 $payment = Fastaar::refundPayment('01jxyz...');
 // $payment['status'] === 'refunded'
+
+$partial = Fastaar::refundPayment('01jxyz...', 200); // refund only part of it
+// $partial['status'] === 'partially_refunded'
+
+$refunds = Fastaar::listRefunds('01jxyz...'); // full refund history, newest first
 ```
 
 ### 5. Customers
